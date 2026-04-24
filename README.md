@@ -298,54 +298,54 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class MLP:
-    """autograd 없이 직접 구현한 MLP — 역전파 공식의 수식 그대로"""
-    def __init__(self, layers, init='he'):
-        self.W, self.b = [], []
-        for n_in, n_out in zip(layers[:-1], layers[1:]):
-            if init == 'xavier':
-                W = np.random.randn(n_out, n_in) * np.sqrt(1.0 / n_in)
-            elif init == 'he':
-                W = np.random.randn(n_out, n_in) * np.sqrt(2.0 / n_in)
-            elif init == 'zero':
-                W = np.zeros((n_out, n_in))
-            self.W.append(W); self.b.append(np.zeros(n_out))
+  """autograd 없이 직접 구현한 MLP — 역전파 공식의 수식 그대로"""
+  def __init__(self, layers, init='he'):
+    self.W, self.b = [], []
+    for n_in, n_out in zip(layers[:-1], layers[1:]):
+      if init == 'xavier':
+        W = np.random.randn(n_out, n_in) * np.sqrt(1.0 / n_in)
+      elif init == 'he':
+        W = np.random.randn(n_out, n_in) * np.sqrt(2.0 / n_in)
+      elif init == 'zero':
+        W = np.zeros((n_out, n_in))
+      self.W.append(W); self.b.append(np.zeros(n_out))
 
-    def forward(self, x):
-        self.a = [x]; self.z = []
-        for i, (W, b) in enumerate(zip(self.W, self.b)):
-            z = W @ self.a[-1] + b
-            a = np.maximum(0, z) if i < len(self.W) - 1 else z   # ReLU + linear output
-            self.z.append(z); self.a.append(a)
-        return self.a[-1]
+  def forward(self, x):
+    self.a = [x]; self.z = []
+    for i, (W, b) in enumerate(zip(self.W, self.b)):
+      z = W @ self.a[-1] + b
+      a = np.maximum(0, z) if i < len(self.W) - 1 else z   # ReLU + linear output
+      self.z.append(z); self.a.append(a)
+    return self.a[-1]
 
-    def backward(self, grad_output):
-        """Reverse-mode AD 직접 구현 — δ_l = (W_{l+1}^T δ_{l+1}) ⊙ σ'(z_l)"""
-        grads_W, grads_b = [None] * len(self.W), [None] * len(self.W)
-        delta = grad_output
-        for l in reversed(range(len(self.W))):
-            if l < len(self.W) - 1:
-                delta = delta * (self.z[l] > 0)          # ReLU derivative
-            grads_W[l] = np.outer(delta, self.a[l])
-            grads_b[l] = delta
-            delta = self.W[l].T @ delta
-        return grads_W, grads_b
+  def backward(self, grad_output):
+    """Reverse-mode AD 직접 구현 — δ_l = (W_{l+1}^T δ_{l+1}) ⊙ σ'(z_l)"""
+    grads_W, grads_b = [None] * len(self.W), [None] * len(self.W)
+    delta = grad_output
+    for l in reversed(range(len(self.W))):
+      if l < len(self.W) - 1:
+        delta = delta * (self.z[l] > 0)          # ReLU derivative
+      grads_W[l] = np.outer(delta, self.a[l])
+      grads_b[l] = delta
+      delta = self.W[l].T @ delta
+    return grads_W, grads_b
 
 # ──────────────────────────────────────────────────────────
 # 실험 1. 초기화별 activation variance 전파 (He가 보존해야 함)
 # ──────────────────────────────────────────────────────────
 def measure_layer_variance(init_method, depth=30, width=256, n_paths=1000):
-    mlp = MLP([width] * depth, init=init_method)
-    variances = []
-    for _ in range(n_paths):
-        x = np.random.randn(width)
-        mlp.forward(x)
-        variances.append([np.var(a) for a in mlp.a[1:]])
-    return np.mean(variances, axis=0)   # 층별 평균 분산
+  mlp = MLP([width] * depth, init=init_method)
+  variances = []
+  for _ in range(n_paths):
+    x = np.random.randn(width)
+    mlp.forward(x)
+    variances.append([np.var(a) for a in mlp.a[1:]])
+  return np.mean(variances, axis=0)   # 층별 평균 분산
 
 plt.figure(figsize=(10, 5))
 for init in ['xavier', 'he', 'zero']:
-    vars_per_layer = measure_layer_variance(init)
-    plt.semilogy(range(1, 31), vars_per_layer, 'o-', label=init, markersize=6)
+  vars_per_layer = measure_layer_variance(init)
+  plt.semilogy(range(1, 31), vars_per_layer, 'o-', label=init, markersize=6)
 plt.axhline(1.0, linestyle='--', color='k', alpha=0.5, label='target Var=1')
 plt.xlabel('Layer depth'); plt.ylabel('Activation variance (log scale)')
 plt.title('ReLU MLP: 초기화별 분산 전파 — He는 상수, Xavier는 감소, Zero는 0')
