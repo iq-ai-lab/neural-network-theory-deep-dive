@@ -2,15 +2,39 @@
 
 # 🧠 Neural Network Theory Deep Dive
 
-**"`torch.nn.Linear → ReLU → Linear`를 쌓는 것과, 왜 1-hidden-layer sigmoid 네트워크가 $C(\mathbb{R}^n)$에서 dense인지 — Cybenko(1989)의 Universal Approximation Theorem이 Hahn-Banach + Riesz 표현의 함수해석에서 나온다는 것을 증명할 수 있는 것은 다르다"**
+### `torch.nn.Linear → ReLU → Linear` 를 쌓는 것과,
+
+### 왜 1-hidden-layer sigmoid 네트워크가
+
+$$C(\mathbb{R}^n) \text{ 에서 dense}$$
+
+### 인지 — **Cybenko 1989** 의 Universal Approximation Theorem 이 **Hahn–Banach + Riesz 표현** 의 함수해석에서 나온다는 것을 증명할 수 있는 것은 **다르다.**
 
 <br/>
 
-> *"`loss.backward()`를 호출하는 것과, 역전파가 연쇄법칙의 오른쪽→왼쪽 Jacobian 결합이고 forward-mode AD가 왜 $O(n \cdot d)$가 되는지를 증명할 수 있는 것은 다르다.  
-> Xavier/He 초기화를 쓰는 것과 — "각 층 activation의 분산 보존"이 왜 $\text{Var}(W) = 2/n_{\text{in}}$ (ReLU)·$1/n_{\text{in}}$ (tanh) 공식을 주는지 한 줄씩 유도할 수 있는 것은 다르다."*
+> *`loss.backward()` 를 **호출하는 것** 과, 역전파가 연쇄법칙의 **오른쪽 → 왼쪽 Jacobian 결합** 이고 forward-mode AD 가 왜*
+>
+> $$O(n \cdot d)$$
+>
+> *가 되는지를 증명할 수 있는 것은 다르다.*
+>
+> *Xavier / He 초기화를 **쓰는 것** 과, "각 층 activation 의 분산 보존" 이 왜*
+>
+> $$\text{Var}(W) = \frac{2}{n_\text{in}} \;(\text{ReLU}), \qquad \frac{1}{n_\text{in}} \;(\text{tanh})$$
+>
+> *공식을 주는지 한 줄씩 유도할 수 있는 것은 다르다.*
 
-퍼셉트론의 Novikoff 수렴 정리부터 UAT(Cybenko·Hornik·Leshno 3가지 증명)·역전파의 Jacobian chain rule 재구성·초기화 분산 방정식·CNN equivariance·RNN BPTT와 vanishing gradient·Transformer attention·ResNet gradient flow까지  
-**"왜 신경망이 표현력을 갖고 학습되는가"** 라는 질문으로 현대 딥러닝 아키텍처의 수학적 기반을 끝까지 파헤칩니다
+<br/>
+
+**다루는 정리·아키텍처 (시간순)**
+
+Rosenblatt 1958 *Perceptron* · Novikoff 1962 *수렴 정리* · Cybenko 1989 / Hornik 1991 / Leshno 1993 *UAT 3가지 증명* · LeCun 1998 *역전파 + Jacobian chain rule* · Glorot 2010 *Xavier* · He 2015 *He 초기화* · LeCun 1998 / Cohen 2016 *CNN equivariance* · Werbos 1990 *BPTT* · Bengio 1994 *vanishing gradient* · Vaswani 2017 *Transformer attention* · He 2016 *ResNet gradient flow*
+
+<br/>
+
+**핵심 질문**
+
+> **왜 신경망이 표현력을 갖고 학습되는가** — 현대 딥러닝 아키텍처의 수학적 기반을 UAT 의 함수해석 증명 · 역전파의 Jacobian chain rule · 초기화 분산 방정식 · equivariance · gradient flow 로 끝까지 파헤칩니다.
 
 <br/>
 
